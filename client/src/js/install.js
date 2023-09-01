@@ -1,28 +1,44 @@
-const butInstall = document.getElementById('buttonInstall');
+const butInstall = document.getElementById("buttonInstall");
 
 // Logic for installing the PWA
-// Event handler for the `beforeinstallprompt` event
-window.addEventListener('beforeinstallprompt', (event) => {
+// Add an event handler to the `beforeinstallprompt` event
+window.addEventListener("beforeinstallprompt", (event) => {
   // Prevent the default behavior of the event
   event.preventDefault();
-  // Store the `beforeinstallprompt` event for later use
-  const installPromptEvent = event;
-  
-  // Event handler for the install button click
-  butInstall.addEventListener('click', async () => {
-    // Show the installation prompt using the stored event
-    installPromptEvent.prompt();
-    // Wait for the user to respond to the prompt
-    const choiceResult = await installPromptEvent.userChoice;
-    
-    // Handle user choice (choiceResult.outcome can be 'accepted' or 'dismissed')
-    if (choiceResult.outcome === 'accepted') {
-      console.log('User accepted the installation prompt');
-    } else {
-      console.log('User dismissed the installation prompt');
-    }
-  });
+
+  // Store the triggered events
+  window.deferredPrompt = event;
+
+  // Remove the hidden class from the button.
+  butInstall.classList.toggle("hidden", false);
 });
+
+// Implement a click event handler on the `butInstall` element
+butInstall.addEventListener("click", async () => {
+  // Retrieve the stored prompt event
+  const promptEvent = window.deferredPrompt;
+
+  // Check if the prompt event exists
+  if (!promptEvent) {
+    return;
+  }
+
+  // Show prompt
+  promptEvent.prompt();
+
+  // Reset the deferred prompt variable, it can only be used once.
+  window.deferredPrompt = null;
+
+  // Hide the installation button
+  butInstall.classList.toggle("hidden", true);
+});
+
+// Add an handler for the `appinstalled` event
+window.addEventListener("appinstalled", (event) => {
+  // Clear prompt
+  window.deferredPrompt = null;
+});
+
 
 // Event handler for the `appinstalled` event
 window.addEventListener('appinstalled', (event) => {
