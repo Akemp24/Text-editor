@@ -40,7 +40,8 @@ export const getDb = async () => {
   const result = await request;
   // complete transaction
   console.log('content read from database', result)
-  return result;
+  return result.map((item) => item.value);
+  // return result;
 }
 
 initdb();
